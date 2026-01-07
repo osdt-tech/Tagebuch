@@ -1,0 +1,16 @@
+[
+  {
+    "date": "2025-12-09",
+    "mood": 7,
+    "energy": 6,
+    "focus": "r",
+    "gratitude": "f",
+    "notes": "tt",
+    "wins": [
+      "f"
+    ],
+    "tomorrow": "f",
+    "prompt": "Welche Begegnung hat dich bewegt?",
+    "createdAt": "2025-12-09T07:12:21.912Z"
+  }
+]

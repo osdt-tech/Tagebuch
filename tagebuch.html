@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tagesbuch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b1224;
+            --card: rgba(255, 255, 255, 0.06);
+            --card-strong: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #f59e0b;
+            --accent-2: #22d3ee;
+            font-family: 'Manrope', 'Sora', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0 solid;
+        }
+
+        html, body {
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+            line-height: 1.5;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.12), transparent 28%),
+                radial-gradient(circle at 80% 10%, rgba(245, 158, 11, 0.14), transparent 30%),
+                #0b1224;
+            min-height: 100vh;
+        }
+
+        .page {
+            position: relative;
+            max-width: 1200px;
+            padding: 32px 20px 48px;
+            margin: 0 auto;
+        }
+
+        .halo {
+            position: fixed;
+            pointer-events: none;
+            filter: blur(72px);
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .halo-a {
+            width: 220px;
+            height: 220px;
+            top: 10%;
+            right: 10%;
+            background: linear-gradient(135deg, #22d3ee, #a855f7);
+        }
+
+        .halo-b {
+            width: 260px;
+            height: 260px;
+            bottom: 5%;
+            left: 8%;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            margin: 0;
+        }
+
+        .eyebrow {
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 11px;
+            color: var(--muted);
+            margin: 0 0 6px;
+        }
+
+        .lede {
+            color: #cbd5e1;
+            margin: 8px 0 14px;
+            max-width: 680px;
+            line-height: 1.5;
+        }
+
+        .hero {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 20px;
+            display: grid;
+            grid-template-columns: 1.3fr 0.9fr;
+            gap: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+
+        .hero-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .chip {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .prompt-card {
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.16), rgba(245, 158, 11, 0.14));
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prompt-text {
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .grid {
+            position: relative;
+            z-index: 1;
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 16px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.02));
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.28);
+        }
+
+        .spotlight {
+            border: 1px solid rgba(34, 211, 238, 0.25);
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 999px;
+            color: #f8fafc;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .tone {
+            background: linear-gradient(90deg, rgba(34, 211, 238, 0.18), rgba(245, 158, 11, 0.14));
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        input, textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 15px;
+            font-family: 'Manrope', sans-serif;
+            outline: none;
+            transition: border 0.2s, transform 0.1s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: rgba(34, 211, 238, 0.6);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .slider {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        input[type="range"] {
+            appearance: none;
+            height: 6px;
+            background: linear-gradient(90deg, rgba(34,211,238,0.7), rgba(245,158,11,0.7));
+            border-radius: 999px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #0f172a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #0f172a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .muted {
+            color: var(--muted);
+            margin: 6px 0;
+        }
+
+        .actions {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .primary {
+            background: linear-gradient(90deg, #22d3ee, #f59e0b);
+            color: #0b1224;
+            font-weight: 700;
+            padding: 12px 20px;
+            border-radius: 14px;
+            min-width: 160px;
+            box-shadow: 0 14px 30px rgba(34, 211, 238, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .primary:active {
+            transform: translateY(0);
+        }
+
+        .ghost {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+
+        .ghost:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .stack {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .timeline-entry {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .tags span {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+        }
+
+        .meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .status {
+            color: var(--muted);
+            font-size: 13px;
+            min-height: 18px;
+        }
+
+        @media (max-width: 960px) {
+            .hero, .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .split {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="page"></div>
+
+    <script>
+        const STORAGE_KEY = 'ct-diary-entries';
+        const FILE_NAME = 'tagebuch-entries.json';
+        const prompts = [
+            'Was hat heute leicht gemacht, was schwer fiel?',
+            'Welche Begegnung hat dich bewegt?',
+            'Worauf warst du stolz – und warum?',
+            'Welcher Gedanke sollte morgen Platz bekommen?',
+            'Was hast du losgelassen?',
+            'Welche Farbe hätte dein Tag? Beschreibe sie.',
+            'Wo hast du Ruhe gefunden?',
+            'Was würdest du gerne festhalten, falls der Tag verblasst?'
+        ];
+
+        const colorStops = ['#22d3ee', '#f59e0b', '#c084fc', '#7dd3fc', '#f97316', '#a3e635'];
+
+        function normalizeEntries(list) {
+            if (!Array.isArray(list)) return [];
+            return list
+                .filter((item) => item && item.date)
+                .map((item) => ({
+                    ...item,
+                    wins: Array.isArray(item.wins) ? item.wins : []
+                }))
+                .sort((a, b) => (a.date < b.date ? 1 : -1));
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const cached = localStorage.getItem(STORAGE_KEY);
+                if (!cached) return null;
+                return normalizeEntries(JSON.parse(cached));
+            } catch (error) {
+                console.warn('Lokale Tagebuchdaten defekt, werden verworfen.', error);
+                localStorage.removeItem(STORAGE_KEY);
+                return null;
+            }
+        }
+
+        function saveToLocalStorage(entries) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+                return true;
+            } catch (error) {
+                console.warn('Konnte localStorage nicht schreiben.', error);
+                return false;
+            }
+        }
+
+        async function readFromOpfs() {
+            if (!navigator.storage?.getDirectory) return null;
+            try {
+                const root = await navigator.storage.getDirectory();
+                const handle = await root.getFileHandle(FILE_NAME);
+                const file = await handle.getFile();
+                const text = await file.text();
+                return normalizeEntries(JSON.parse(text));
+            } catch (error) {
+                return null;
+            }
+        }
+
+        async function writeToOpfs(entries) {
+            if (!navigator.storage?.getDirectory) return false;
+            try {
+                const root = await navigator.storage.getDirectory();
+                const handle = await root.getFileHandle(FILE_NAME, { create: true });
+                const writable = await handle.createWritable();
+                await writable.write(JSON.stringify(entries, null, 2));
+                await writable.close();
+                return true;
+            } catch (error) {
+                console.warn('OPFS-Speichern fehlgeschlagen.', error);
+                return false;
+            }
+        }
+
+        async function loadBundledEntries() {
+            try {
+                const response = await fetch(FILE_NAME, { cache: 'no-cache' });
+                if (!response.ok) throw new Error(`Status ${response.status}`);
+                const text = await response.text();
+                return normalizeEntries(JSON.parse(text));
+            } catch (error) {
+                console.warn('Konnte tagebuch-entries.json nicht laden.', error);
+                return null;
+            }
+        }
+
+        function syncEntries(target, source) {
+            target.splice(0, target.length, ...source);
+        }
+
+        function formatDateKey(date) {
+            return date.toISOString().slice(0, 10);
+        }
+
+        function formatDateHuman(date) {
+            return new Intl.DateTimeFormat('de-DE', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }).format(date);
+        }
+
+        function formatTime() {
+            return new Intl.DateTimeFormat('de-DE', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(new Date());
+        }
+
+        function formatRelative(dateStr) {
+            if (!dateStr) return 'frisch gestartet';
+            const diff = Date.now() - new Date(dateStr).getTime();
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            if (hours < 1) return 'vor wenigen Minuten';
+            if (hours === 1) return 'vor 1 Stunde';
+            if (hours < 24) return `vor ${hours} Stunden`;
+            const days = Math.floor(hours / 24);
+            return `vor ${days} Tag${days === 1 ? '' : 'en'}`;
+        }
+
+        function truncate(text, length) {
+            return text.length > length ? `${text.slice(0, length)} …` : text;
+        }
+
+        function getRandomPrompt(exclude) {
+            const available = prompts.filter(p => p !== exclude);
+            return available[Math.floor(Math.random() * available.length)];
+        }
+
+        function moodCopy(level) {
+            if (level >= 9) return { title: 'weit & wach', description: 'Du vibrierst – atme tief, gönn dir Dankbarkeit.' };
+            if (level >= 7) return { title: 'hell & klar', description: 'Gute Spannung, kleiner Fokus-Check genügt.' };
+            if (level >= 5) return { title: 'ausbalanciert', description: 'Ruhig mit Raum für leise Impulse.' };
+            if (level >= 3) return { title: 'gedämpft', description: 'Vielleicht hilft ein kurzer Stretch oder Tee.' };
+            return { title: 'unter Druck', description: 'Sanft sein. Eine Notiz genügt, du bist hier.' };
+        }
+
+        async function loadEntries() {
+            const fromLocal = loadFromLocalStorage();
+            if (fromLocal) return fromLocal;
+
+            const fromOpfs = await readFromOpfs();
+            if (fromOpfs) {
+                saveToLocalStorage(fromOpfs);
+                return fromOpfs;
+            }
+
+            const bundled = await loadBundledEntries();
+            if (bundled) {
+                await writeToOpfs(bundled);
+                saveToLocalStorage(bundled);
+                return bundled;
+            }
+
+            return [];
+        }
+
+        async function persistEntries(data) {
+            const normalized = normalizeEntries(data);
+            const wroteLocal = saveToLocalStorage(normalized);
+            const wroteOpfs = await writeToOpfs(normalized);
+            return { success: Boolean(wroteLocal || wroteOpfs), entries: normalized };
+        }
+        function calculateStreak(list) {
+            if (!list.length) return 0;
+            const sorted = [...list].sort((a, b) => a.date < b.date ? 1 : -1);
+            let streak = 0;
+            let cursor = new Date();
+
+            for (const entry of sorted) {
+                if (entry.date === formatDateKey(cursor)) {
+                    streak += 1;
+                    cursor.setDate(cursor.getDate() - 1);
+                } else if (entry.date < formatDateKey(cursor)) {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        function escapeInput(value) {
+            const div = document.createElement('div');
+            div.textContent = value;
+            return div.innerHTML;
+        }
+
+        function updateMoodLabel(level, moodLabel) {
+            if (!moodLabel) return;
+            const copy = moodCopy(level);
+            const accent = colorStops[level % colorStops.length];
+            moodLabel.textContent = `Level ${level} · ${copy.title}`;
+            moodLabel.style.background = `linear-gradient(90deg, ${accent}33, #ffffff10)`;
+            moodLabel.title = copy.description;
+        }
+
+        function notify(message, saveStatus) {
+            if (!saveStatus) return;
+            saveStatus.textContent = message;
+            if (saveStatus.animate) {
+                saveStatus.animate(
+                    [
+                        { opacity: 0, transform: 'translateY(4px)' },
+                        { opacity: 1, transform: 'translateY(0)' },
+                        { opacity: 0, transform: 'translateY(-4px)' }
+                    ],
+                    { duration: 2200 }
+                );
+            }
+        }
+
+        async function init() {
+            const app = document.querySelector('#app');
+            if (!app) throw new Error('App-Root nicht gefunden.');
+
+            const entries = await loadEntries();
+            const todayKey = formatDateKey(new Date());
+            const todaysEntry = entries.find(entry => entry.date === todayKey);
+            const initialPrompt = todaysEntry?.prompt ?? getRandomPrompt();
+
+            app.innerHTML = `
+                <div class="halo halo-a"></div>
+                <div class="halo halo-b"></div>
+                <header class="hero">
+                    <div>
+                        <p class="eyebrow">Tagesbuch · ${formatDateHuman(new Date())}</p>
+                        <h1>Neuer Eintrag</h1>
+                        <p class="lede">Ein kurzer Abendgang durch den Tag: Stimmung spüren, Highlights sichern, Gedanken loslassen.</p>
+                        <div class="hero-chips">
+                            <span class="chip">${entries.length || 'Noch kein'} Eintrag${entries.length === 1 ? '' : 'e'}</span>
+                            <span class="chip">Streak: ${calculateStreak(entries)} Tag${calculateStreak(entries) === 1 ? '' : 'e'}</span>
+                            <span class="chip">Zuletzt aktualisiert ${formatRelative(entries[0]?.createdAt)}</span>
+                        </div>
+                    </div>
+                    <div class="prompt-card">
+                        <p class="eyebrow">Impuls des Tages</p>
+                        <div class="prompt-text" id="promptText">${initialPrompt}</div>
+                        <button type="button" class="ghost" id="newPromptBtn">Neuer Impuls</button>
+                    </div>
+                </header>
+                <form id="journalForm" class="grid">
+                    <section class="card spotlight">
+                        <div class="card-head">
+                            <div>
+                                <p class="eyebrow">Momentaufnahme</p>
+                                <h2>Wie fühlt sich dein Tag an?</h2>
+                            </div>
+                            <div class="pill">
+                                ${todayKey} · ${formatTime()}
+                            </div>
+                        </div>
+                        <textarea id="notes" placeholder="Schreib frei drauf los: Gedanken, Szenen, Gerüche..." rows="6">${escapeInput(todaysEntry?.notes ?? '')}</textarea>
+                        <div class="split">
+                            <label class="field">
+                                <span>Schwerpunkt heute</span>
+                                <input id="focus" type="text" placeholder="z.B. Gespräche, Klarheit, Mut, Tempo" value="${escapeInput(todaysEntry?.focus ?? '')}" />
+                            </label>
+                            <label class="field">
+                                <span>Dankbarkeit</span>
+                                <input id="gratitude" type="text" placeholder="Wofür schlägt dein Herz heute leise?" value="${escapeInput(todaysEntry?.gratitude ?? '')}" />
+                            </label>
+                        </div>
+                        <label class="field">
+                            <span>Highlights & kleine Siege</span>
+                            <textarea id="wins" rows="3" placeholder="Liste stichpunktartig – Enter für neue Zeile.">${escapeInput(todaysEntry?.wins?.join('\n') ?? '')}</textarea>
+                        </label>
+                        <label class="field">
+                            <span>Morgen nehme ich mir vor</span>
+                            <textarea id="tomorrow" rows="2" placeholder="Welche Haltung, welcher nächste Schritt?">${escapeInput(todaysEntry?.tomorrow ?? '')}</textarea>
+                        </label>
+                        <div class="actions">
+                            <div class="status" id="saveStatus" aria-live="polite"></div>
+                            <button type="submit" class="primary">Eintrag sichern</button>
+                        </div>
+                    </section>
+                    <section class="stack">
+                        <div class="card">
+                            <div class="card-head">
+                                <div>
+                                    <p class="eyebrow">Stimmung</p>
+                                    <h3>Wie weit, wie ruhig?</h3>
+                                </div>
+                                <span id="moodLabel" class="pill tone">Level ${todaysEntry?.mood ?? 7} · ${moodCopy(todaysEntry?.mood ?? 7).title}</span>
+                            </div>
+                            <div class="slider">
+                                <span>Gedrückt</span>
+                                <input id="mood" type="range" min="1" max="10" value="${todaysEntry?.mood ?? 7}" />
+                                <span>Weit</span>
+                            </div>
+                            <p class="muted">${moodCopy(todaysEntry?.mood ?? 7).description}</p>
+                            <div class="slider energy">
+                                <span>Tief</span>
+                                <input id="energy" type="range" min="1" max="10" value="${todaysEntry?.energy ?? 6}" />
+                                <span>Voller Saft</span>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-head">
+                                <div>
+                                    <p class="eyebrow">Chronik</p>
+                                    <h3>Letzte Einträge</h3>
+                                </div>
+                                <button type="button" class="ghost" id="clearBtn">Nur heute behalten</button>
+                            </div>
+                            <div id="timeline" class="timeline"></div>
+                        </div>
+                    </section>
+                </form>
+            `;
+
+            // Selektoren
+            const moodInput = document.querySelector('#mood');
+            const energyInput = document.querySelector('#energy');
+            const moodLabel = document.querySelector('#moodLabel');
+            const promptText = document.querySelector('#promptText');
+            const newPromptBtn = document.querySelector('#newPromptBtn');
+            const clearBtn = document.querySelector('#clearBtn');
+            const saveStatus = document.querySelector('#saveStatus');
+            const timeline = document.querySelector('#timeline');
+            const form = document.querySelector('#journalForm');
+
+            if (!moodInput || !energyInput || !moodLabel || !promptText || !newPromptBtn || !clearBtn || !timeline || !form) {
+                throw new Error('Ein Element im Formular fehlt.');
+            }
+
+            function renderTimeline() {
+                if (!timeline) return;
+                if (!entries.length) {
+                    timeline.innerHTML = '<p class="muted">Noch nichts festgehalten. Dein erster Eintrag wartet.</p>';
+                    return;
+                }
+
+                const lastSeven = entries.slice(0, 7);
+                timeline.innerHTML = lastSeven
+                    .map((entry) => {
+                        const wins = entry.wins?.length
+                            ? `<div class="tags">${entry.wins.map(w => `<span>${escapeInput(w)}</span>`).join('')}</div>`
+                            : '';
+                        const focus = entry.focus ? escapeInput(entry.focus) : 'Fokus: ruhig & klar';
+                        const note = entry.notes && entry.notes.trim().length
+                            ? escapeInput(truncate(entry.notes, 140))
+                            : 'Ohne Text – vielleicht nur ein gutes Gefühl.';
+                        const gratitude = entry.gratitude ? escapeInput(entry.gratitude) : 'Dankbarkeit: leise';
+                        return `
+                            <article class="timeline-entry">
+                                <div>
+                                    <p class="eyebrow">${entry.date}</p>
+                                    <h4>${focus}</h4>
+                                    <p class="muted">${note}</p>
+                                    ${wins}
+                                </div>
+                                <div class="meta">
+                                    <span class="pill">Mood ${entry.mood}</span>
+                                    <span class="pill">${gratitude}</span>
+                                </div>
+                            </article>
+                        `;
+                    })
+                    .join('');
+            }
+
+            updateMoodLabel(Number(moodInput.value), moodLabel);
+            renderTimeline();
+
+            moodInput.addEventListener('input', (event) => {
+                const value = Number(event.target.value);
+                updateMoodLabel(value, moodLabel);
+            });
+
+            newPromptBtn.addEventListener('click', () => {
+                const next = getRandomPrompt(promptText.textContent ?? '');
+                promptText.textContent = next;
+            });
+
+            clearBtn.addEventListener('click', async () => {
+                const onlyToday = entries.filter(entry => entry.date === todayKey);
+                const result = await persistEntries(onlyToday);
+                syncEntries(entries, result.entries);
+                renderTimeline();
+                notify(result.success ? 'Aeltere Eintraege ausgeblendet. Nur heute bleibt.' : 'Konnte nicht speichern.', saveStatus);
+            });
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const notes = (document.querySelector('#notes')?.value ?? '').trim();
+                const focus = (document.querySelector('#focus')?.value ?? '').trim();
+                const gratitude = (document.querySelector('#gratitude')?.value ?? '').trim();
+                const winsRaw = (document.querySelector('#wins')?.value ?? '').trim();
+                const tomorrow = (document.querySelector('#tomorrow')?.value ?? '').trim();
+                const mood = Number(moodInput?.value ?? 5);
+                const energy = Number(energyInput?.value ?? 5);
+                const prompt = promptText?.textContent?.trim() || getRandomPrompt();
+                const wins = winsRaw.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+
+                const entry = {
+                    date: todayKey,
+                    mood,
+                    energy,
+                    focus,
+                    gratitude,
+                    notes,
+                    wins,
+                    tomorrow,
+                    prompt,
+                    createdAt: new Date().toISOString()
+                };
+
+                const existingIndex = entries.findIndex(item => item.date === entry.date);
+                if (existingIndex >= 0) {
+                    entries.splice(existingIndex, 1, entry);
+                } else {
+                    entries.unshift(entry);
+                }
+
+                const result = await persistEntries(entries);
+                syncEntries(entries, result.entries);
+                renderTimeline();
+                notify(result.success ? 'Gespeichert - du hast den Tag eingefangen.' : 'Speichern fehlgeschlagen. Bitte versuche es erneut.', saveStatus);
+            });
+        }
+
+        // Initialisieren
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
